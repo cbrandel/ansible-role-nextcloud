@@ -1,0 +1,35 @@
+---
+# defaults file for ansible-role-synology-nextcloud
+# [CONFIG]
+nextcloud_channel: "releases"
+# nextcloud_channel: releases | prereleases | daily | latest
+nextcloud_version: 11.0.1
+# nextcloud_version for releases, prereleases and daily channel
+nextcloud_branch: "stable"
+# specified branch for daily & latest channel
+nextcloud_repository: "https://download.nextcloud.com/server"
+# Domain URL where to download Nextcloud.
+# Path will be calculated following channel, version and branch.
+nextcloud_archive_type: "tar.bz2"
+# type of archive that should be downloaded: zip or tar.bz2
+
+nextcloud_trusted_domain: ["{{ ansible_default_ipv4.address }}"]
+nextcloud_instance_name: "{{ nextcloud_trusted_domain | first }}"
+
+nextcloud_webroot: "/volume1/web/nc"
+nextcloud_data_dir: "/volume1/webdata/ncdata"
+nextcloud_admin_name: "admin"
+nextcloud_admin_pwd: "secret"
+
+# [DATABASE]
+nextcloud_db_backend: "mariadb"
+nextcloud_db_host: "127.0.0.1"
+nextcloud_db_backend: "mysql"
+nextcloud_db_name: "nextcloud"
+nextcloud_db_admin: "ncadmin"
+nextcloud_db_pwd: "secret"
+
+# [SYSTEM]
+websrv_user: "http"
+websrv_group: "http"
+mysql_root_pwd: "secret"

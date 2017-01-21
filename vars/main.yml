@@ -1,0 +1,14 @@
+---
+# vars file for ansible-role-synology-nextcloud
+
+nextcloud_dl_path:
+  releases: "releases"
+  prereleases: "prereleases"
+  daily: "daily"
+  latest: "daily"
+nextcloud_dl_file:
+  releases: "nextcloud-{{nextcloud_version}}.{{nextcloud_archive_type}}"
+  prereleases: "nextcloud-{{nextcloud_version}}.{{nextcloud_archive_type}}"
+  daily: "nextcloud-{{nextcloud_branch}}-daily-{{nextcloud_version}}.{{nextcloud_archive_type}}"
+  latest: "latest-{{nextcloud_branch}}.{{nextcloud_archive_type}}"
+nextcloud_full_url: "{{nextcloud_repository}}/{{nextcloud_dl_path[nextcloud_channel]}}/{{nextcloud_dl_file[nextcloud_channel]}}"

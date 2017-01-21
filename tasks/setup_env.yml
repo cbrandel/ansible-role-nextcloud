@@ -1,0 +1,11 @@
+---
+# additionnal setup and fixes for OS dependent environment
+- name: "[NC-ENV] - check if we really run on Synology DSM"
+  fail:
+    msg: "This Role is supposed to be run on a Synology DiskStation."
+  when:  'not ansible_check_mode and "DS" not in ansible_cmdline.syno_hw_version'
+
+- name: "[NC-ENV] - controls nextcloud_trusted_domain type"
+  fail:
+    msg: "New versions require nextcloud_trusted_domain to be declared as a list."
+  when: nextcloud_trusted_domain is string

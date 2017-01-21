@@ -1,0 +1,31 @@
+---
+- name: "[mySQL] - Check credentials"
+  stat: "path=/root/.my.cnf"
+  register: mycred
+
+- block:
+  - name: "[mySQL] - Make the file .my.cnf"
+    file: path=/root/.my.cnf state=touch mode="0640"
+
+  - name: "[mySQL] - Add content to .my.cnf"
+    blockinfile:
+      dest: /root/.my.cnf
+      block: |
+        [client]
+        user=root
+        password="{{ mysql_root_pwd }}"
+  when: mycred.stat.exists is defined and not mycred.stat.exists
+
+- name: "[mySQL] - Generate database user Password."
+  set_fact: nextcloud_db_pwd="{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/db_admin.pwd' ) }}"
+  when: nextcloud_db_pwd is not defined
+
+- name: "[mySQL] - Add Database {{ nextcloud_db_name }}."
+  mysql_db: name={{ nextcloud_db_name }} state=present
+
+- name: "[mySQL] - Configure the database user."
+  mysql_user:
+    name: "{{ nextcloud_db_admin }}"
+    password: "{{ nextcloud_db_pwd }}"
+    priv: "{{ nextcloud_db_name }}.*:ALL"
+    state: present
