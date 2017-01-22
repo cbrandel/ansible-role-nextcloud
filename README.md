@@ -5,6 +5,9 @@ Role to install nextcloud on Synology DSM 6.x.
 Inspired and heavily borrowed from
 - https://github.com/aalaesar/install_nextcloud
 
+Synology help from here:
+- https://primalcortex.wordpress.com/2016/01/25/synology-installing-python-pip-package-installer/
+-
 Requirements
 ------------
 
@@ -13,6 +16,10 @@ Synology DiskStation DSM 6
 PHP 7 with the following settings:
 - Enable PHP cache
 - Customize PHP open_basedir: must include the path to the NC data directory
+
+MariaDB enabled with the following settings:
+- BINLOG_FORMAT (binlog format): MIXED
+- Transaction Isolation (tx isolation): READ_COMITTED
 
 Tested on
 - Synology DS-211+

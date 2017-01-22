@@ -1,13 +1,13 @@
 ---
-- name: "[mySQL] - Check credentials"
+- name: "[mySQL] Check credentials"
   stat: "path=/root/.my.cnf"
   register: mycred
 
 - block:
-  - name: "[mySQL] - Make the file .my.cnf"
+  - name: "[mySQL] Make the file .my.cnf"
     file: path=/root/.my.cnf state=touch mode="0640"
 
-  - name: "[mySQL] - Add content to .my.cnf"
+  - name: "[mySQL] Add content to .my.cnf"
     blockinfile:
       dest: /root/.my.cnf
       block: |
@@ -16,16 +16,45 @@
         password="{{ mysql_root_pwd }}"
   when: mycred.stat.exists is defined and not mycred.stat.exists
 
-- name: "[mySQL] - Generate database user Password."
-  set_fact: nextcloud_db_pwd="{{ lookup( 'password', 'nextcloud_instances/'+ nextcloud_instance_name +'/db_admin.pwd' ) }}"
-  when: nextcloud_db_pwd is not defined
+- name: "[mySQL] Check {{ds_mycnf_file}}"
+  stat:
+    path: "{{ds_mycnf_file}}"
+  register: myconf
 
-- name: "[mySQL] - Add Database {{ nextcloud_db_name }}."
-  mysql_db: name={{ nextcloud_db_name }} state=present
+- name: "[mySQL] Make sure file {{ds_mycnf_file}} exists"
+  file:
+    path: "{{ ds_mycnf_file }}"
+    state:  touch
+  when: myconf.stat.exists is defined and not myconf.stat.exists
 
-- name: "[mySQL] - Configure the database user."
-  mysql_user:
-    name: "{{ nextcloud_db_admin }}"
-    password: "{{ nextcloud_db_pwd }}"
-    priv: "{{ nextcloud_db_name }}.*:ALL"
-    state: present
+- name: "[mySQL] Adapt DB settings"
+  ini_file:
+    dest: "{{ ds_mycnf_file }}"
+    section:  "mysqld"
+    option: "{{ item.k }}"
+    value:   "{{ item.v }}"
+  with_items:
+    - { k: 'binlog_format', v: 'MIXED' }
+    - { k: 'transaction_isolation', v: 'READ-COMMITTED' }
+  notify: restart mariadb
+
+- name: "[mySQL] Add Database {{ nextcloud_db_name }}."
+  command: >
+    mysql mysql
+    --host={{nextcloud_db_host}} --batch --skip-column-names
+    --execute="CREATE DATABASE IF NOT EXISTS {{ nextcloud_db_name }};"
+  changed_when: False
+
+- name: "[mySQL] check if the database user {{ nextcloud_db_admin }} already exists."
+  command: "echo `mysql -e ‘use mysql; SELECT {{ nextcloud_db_admin }} FROM user;’` | grep ‘{{ nextcloud_db_admin }}‘"
+  changed_when: False
+  register: has_user
+
+- name: "[mySQL] Create the database user {{ nextcloud_db_admin }}."
+  command: >
+    mysql mysql
+    --host={{nextcloud_db_host}} --batch --skip-column-names
+    --execute="CREATE USER '{{ nextcloud_db_admin }}'@'localhost' IDENTIFIED BY '{{ nextcloud_db_pwd }}';
+    GRANT USAGE ON {{ nextcloud_db_name }}.* TO {{ nextcloud_db_admin }};"
+  changed_when: False
+  when: not has_user

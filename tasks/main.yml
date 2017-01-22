@@ -1,7 +1,6 @@
 ---
 # tasks file for ansible-role-synology-nextcloud
 - include: tasks/setup_env.yml
-  # load os specific variables
 
 - name: Configure {{ nextcloud_db_backend }} database
   include: tasks/db_mysql.yml

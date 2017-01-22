@@ -36,7 +36,7 @@
   - name: "[NC] - Run occ installation command"
     become_user: "{{ websrv_user }}"
     command: >
-        php occ maintenance:install
+        {{php_binary}} occ maintenance:install
         --database={{ nextcloud_tmp_backend }}
         --database-host={{ nextcloud_db_host }}
         --database-name={{ nextcloud_db_name }}
@@ -55,7 +55,7 @@
     failed_when: _confsize.stat.size is undefined or _confsize.stat.size <= 100
 
   - name: "[NC] - Verify config.php - php syntax check"
-    command: "php -l {{ nextcloud_webroot }}/config/config.php"
+    command: "{{php_binary}} -l {{ nextcloud_webroot }}/config/config.php"
     register: _confphp
     changed_when: False
     failed_when: _confphp.rc is defined and _confphp.rc != 0
