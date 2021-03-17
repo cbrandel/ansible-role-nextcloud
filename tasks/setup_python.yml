@@ -1,0 +1,19 @@
+---
+- name: "[PY] - check if pip exists"
+  command: which pip
+  changed_when: false
+  ignore_errors: yes
+  register: has_pip
+
+- block:
+  - name: "[PY] - get pip"
+    get_url:
+      url:  "https://bootstrap.pypa.io/get-pip.py"
+      dest: "/tmp/get-pip.py"
+
+  - name: "[PY] - install pip"
+    command: python /tmp/get-pip.py
+  when: has_pip.rc == 1
+
+- name: "[PY] - Install the Python MySQLB module"
+  pip: name=MySQL-python

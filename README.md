@@ -1,5 +1,7 @@
 ansible-role-synology-nextcloud
-=============
+===============================
+
+ABANDONED: I don't use this anymore use at your own risk.
 
 Role to install nextcloud on Synology DSM 6.x.
 Inspired and heavily borrowed from

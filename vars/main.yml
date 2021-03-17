@@ -15,3 +15,8 @@ nextcloud_full_url: "{{nextcloud_repository}}/{{nextcloud_dl_path[nextcloud_chan
 
 # MariaDB config file for DSM
 ds_mycnf_file: "/var/packages/MariaDB/etc/my.cnf"
+
+# PHP7 settings iles for DSM
+php_binary: "/usr/local/bin/php70"
+php_ini: "/usr/syno/etc/packages/WebStation/php70/php.ini"
+php_ini_dir: "/usr/syno/etc/packages/WebStation/php70/conf.d/"
